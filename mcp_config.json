@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "tiered-router": {
+      "command": "python",
+      "args": [
+        "server/tiered_router_mcp.py"
+      ],
+      "env": {
+        "OLLAMA_HOST": "http://127.0.0.1:11434"
+      }
+    }
+  }
+}

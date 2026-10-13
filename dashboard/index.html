@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity Tiered Router — Benchmark & Telemetria</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h1 class="header-title">Antigravity Tiered Router</h1>
+          <p class="header-subtitle">Dashboard de Benchmark, Economia de Tokens & Decisão Neural (Kev vs. Heurística)</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="status-pill status-ready" id="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-text">Motor Híbrido: Pronto</span>
+        </div>
+        <button class="btn btn-secondary" id="btn-re-run-bench">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Atualizar Dados
+        </button>
+      </div>
+    </header>
+
+    <!-- Top KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card card-glow-emerald">
+        <div class="kpi-header">
+          <span class="kpi-label">Economia Total de Tokens</span>
+          <span class="kpi-badge badge-emerald">-28.5% Global</span>
+        </div>
+        <div class="kpi-value" id="kpi-tokens-saved">27,247</div>
+        <div class="kpi-subtext">tokens economizados na bateria de 10 tarefas (até <strong>-84%</strong> em tarefas rápidas)</div>
+        <div class="kpi-progress-bar">
+          <div class="kpi-progress-fill fill-emerald" style="width: 71.5%;"></div>
+        </div>
+      </div>
+
+      <div class="kpi-card card-glow-cyan">
+        <div class="kpi-header">
+          <span class="kpi-label">Aceleração de Resposta</span>
+          <span class="kpi-badge badge-cyan">1.24x a 3.5x</span>
+        </div>
+        <div class="kpi-value" id="kpi-speedup">6,641 ms</div>
+        <div class="kpi-subtext">tempo poupado (27.2s vs. 33.8s baseline com todos em High)</div>
+        <div class="kpi-progress-bar">
+          <div class="kpi-progress-fill fill-cyan" style="width: 80.4%;"></div>
+        </div>
+      </div>
+
+      <div class="kpi-card card-glow-indigo">
+        <div class="kpi-header">
+          <span class="kpi-label">Latência do Roteador (Kev vs Heurística)</span>
+          <span class="kpi-badge badge-indigo">Single-Pass</span>
+        </div>
+        <div class="kpi-value" id="kpi-decision-latency">0.2 ms / 32.4 ms</div>
+        <div class="kpi-subtext">Heurística local (0.2ms) | Kev System One (32.4ms) | Nuvem (0 tokens)</div>
+        <div class="kpi-progress-bar">
+          <div class="kpi-progress-fill fill-indigo" style="width: 95%;"></div>
+        </div>
+      </div>
+
+      <div class="kpi-card card-glow-amber">
+        <div class="kpi-header">
+          <span class="kpi-label">Escalonamento por Incerteza</span>
+          <span class="kpi-badge badge-amber">100% Assertivo</span>
+        </div>
+        <div class="kpi-value" id="kpi-escalation-rate">2 / 2 detectados</div>
+        <div class="kpi-subtext">subagentes com hesitação ou erro foram promovidos automaticamente</div>
+        <div class="kpi-progress-bar">
+          <div class="kpi-progress-fill fill-amber" style="width: 100%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visual Charts Row -->
+    <section class="charts-row">
+      <!-- Token Comparison Chart -->
+      <div class="chart-card">
+        <div class="card-title-row">
+          <div>
+            <h2 class="card-title">Consumo de Tokens por Tarefa</h2>
+            <p class="card-desc">Comparação direta: Monolítico (Sempre High) vs. Tiered Router</p>
+          </div>
+          <div class="legend-row">
+            <span class="legend-item"><span class="legend-box box-baseline"></span>Sempre High</span>
+            <span class="legend-item"><span class="legend-box box-router"></span>Tiered Router</span>
+          </div>
+        </div>
+        <div class="chart-container" id="token-chart-container">
+          <!-- Dynamically populated bars -->
+        </div>
+      </div>
+
+      <!-- Tier Distribution & Speedup -->
+      <div class="chart-card chart-card-sm">
+        <div class="card-title-row">
+          <div>
+            <h2 class="card-title">Distribuição por Camadas</h2>
+            <p class="card-desc">Alocação de subagentes no benchmark</p>
+          </div>
+        </div>
+        <div class="tier-breakdown-wrapper">
+          <div class="tier-stat-item stat-low">
+            <div class="tier-stat-icon">🌱</div>
+            <div class="tier-stat-info">
+              <div class="tier-stat-name">Tier 1: Low (Flash Low)</div>
+              <div class="tier-stat-desc">3 tarefas (30%) • ~84% economia</div>
+            </div>
+            <div class="tier-stat-pill pill-emerald">Flash Low</div>
+          </div>
+          <div class="tier-stat-item stat-medium">
+            <div class="tier-stat-icon">⚙️</div>
+            <div class="tier-stat-info">
+              <div class="tier-stat-name">Tier 2: Medium (Flash Medium)</div>
+              <div class="tier-stat-desc">4 tarefas (40%) • ~55% economia</div>
+            </div>
+            <div class="tier-stat-pill pill-amber">Flash Med</div>
+          </div>
+          <div class="tier-stat-item stat-high">
+            <div class="tier-stat-icon">👑</div>
+            <div class="tier-stat-info">
+              <div class="tier-stat-name">Tier 3: High (Flash High)</div>
+              <div class="tier-stat-desc">3 tarefas (30%) • Consultoria / Arquitetura</div>
+            </div>
+            <div class="tier-stat-pill pill-indigo">Flash High</div>
+          </div>
+        </div>
+
+        <div class="model-comparison-box">
+          <div class="model-box-title">Comparativo Kev vs. Heurística Local:</div>
+          <div class="model-diff-row">
+            <span><strong>Kev (Ollama):</strong> Classificação neural não-autoregressiva (System One) sem geração de tokens (~32ms).</span>
+          </div>
+          <div class="model-diff-row">
+            <span><strong>Heurística Local:</strong> Semântica determinística com regex de fronteira (~0.2ms, zero RAM).</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Live Simulator Section -->
+    <section class="simulator-section">
+      <div class="simulator-card">
+        <div class="card-title-row">
+          <div>
+            <div class="badge-tag">INTERATIVO</div>
+            <h2 class="card-title">Testador & Simulador de Roteamento em Tempo Real</h2>
+            <p class="card-desc">Digite qualquer instrução ou selecione um preset para ver como o roteador toma a decisão e escalona.</p>
+          </div>
+          <div class="engine-toggle">
+            <span class="engine-toggle-label">Motor Ativo:</span>
+            <button class="toggle-btn active" id="btn-engine-hybrid">Kev (Neural System One)</button>
+            <button class="toggle-btn" id="btn-engine-heuristic">Heurística Determinística</button>
+            <button class="toggle-btn" id="btn-engine-baseline">Sem Router (High)</button>
+          </div>
+        </div>
+
+        <div class="simulator-presets">
+          <span class="presets-label">Exemplos Rápidos:</span>
+          <button class="preset-pill" data-prompt="listar arquivos e verificar onde está declarada a porta do servidor">🔍 Inspeção Simples</button>
+          <button class="preset-pill" data-prompt="implementar novo endpoint POST /api/auth/register com hash de senha e validação">💻 Criar Rota REST</button>
+          <button class="preset-pill" data-prompt="redesign da arquitetura do banco distribuído e auditoria de segurança contra concorrência">🏛️ Arquitetura Crítica</button>
+          <button class="preset-pill" data-prompt="verifique por que o teste unitário quebrou no payment service" data-uncertain="true">⚠️ Simular Erro & Incerteza</button>
+        </div>
+
+        <div class="simulator-input-row">
+          <textarea id="sim-prompt-input" rows="2" placeholder="Digite seu prompt ou tarefa aqui (ex: 'verificar o arquivo docker-compose.yml e checar a versão do redis')...">verifique por que o teste unitário quebrou no payment service</textarea>
+          <div class="sim-controls-col">
+            <label class="checkbox-label">
+              <input type="checkbox" id="sim-uncertain-check" checked>
+              Simular Incerteza no Subagente
+            </label>
+            <button class="btn btn-primary" id="btn-run-sim">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Simular Decisão
+            </button>
+          </div>
+        </div>
+
+        <!-- Simulation Pipeline Animation Result -->
+        <div class="sim-pipeline" id="sim-pipeline">
+          <div class="pipeline-step step-input">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Prompt Recebido</div>
+              <div class="step-desc" id="sim-res-prompt">Aguardando execução...</div>
+            </div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-step step-router">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Decisão do Roteador</div>
+              <div class="step-desc" id="sim-res-router">Classificando...</div>
+            </div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-step step-subagent">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Subagente Alocado</div>
+              <div class="step-desc" id="sim-res-subagent">Aguardando...</div>
+            </div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-step step-result">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Resultado & Economia</div>
+              <div class="step-desc" id="sim-res-metrics">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benchmark Detail Table -->
+    <section class="table-section">
+      <div class="table-card">
+        <div class="card-title-row">
+          <div>
+            <h2 class="card-title">Tabela Completa de Cenários de Benchmark</h2>
+            <p class="card-desc">Detalhamento dos 10 testes com comparação de tokens, tempo e escalonamentos.</p>
+          </div>
+          <div class="filter-tabs" id="filter-tabs">
+            <button class="filter-tab active" data-filter="all">Todos (10)</button>
+            <button class="filter-tab" data-filter="inspection">Inspeção (2)</button>
+            <button class="filter-tab" data-filter="quick_edit">Edição Simples (1)</button>
+            <button class="filter-tab" data-filter="implementation">Implementação (3)</button>
+            <button class="filter-tab" data-filter="architecture">Arquitetura (2)</button>
+            <button class="filter-tab" data-filter="escalation">Escalonamento (2)</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="benchmark-table">
+            <thead>
+              <tr>
+                <th>Cenário / Tarefa</th>
+                <th>Categoria</th>
+                <th>Alocação (Tier)</th>
+                <th>Tokens Baseline</th>
+                <th>Tokens Router</th>
+                <th>Economia</th>
+                <th>Tempo Resposta</th>
+                <th>Status / Fallback</th>
+              </tr>
+            </thead>
+            <tbody id="benchmark-tbody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div>
+        <span>Antigravity Tiered Router MCP Plugin</span> • 100% Local, Seguro & Gratuito
+      </div>
+      <div>
+        Compatível com <strong>Google Antigravity IDE</strong>, <strong>Ollama Kev</strong> e <strong>Gemini 3.8 Flash</strong>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

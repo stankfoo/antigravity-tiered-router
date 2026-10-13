@@ -1,0 +1,6 @@
+﻿# Antigravity Tiered Router - Modelfile for Kev-0.8B
+# Official decision model checkpoint (Jared Palmer / GGML)
+# For setup and GGUF download instructions, see scripts/setup_kev.ps1
+FROM ./models/Kev-0.8B-Q8_0.gguf
+
+PARAMETER temperature 0.0

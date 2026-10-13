@@ -1,0 +1,336 @@
+{
+  "timestamp": "2026-10-13T17:56:36Z",
+  "total_tasks": 10,
+  "totals": {
+    "baseline_tokens": 95580,
+    "heuristic_tokens": 68333,
+    "kev_tokens": 56823,
+    "heuristic_savings_pct": 28.5,
+    "kev_savings_pct": 40.5,
+    "heuristic_avg_decision_ms": 0.399,
+    "kev_avg_decision_ms": 245.844,
+    "speedup_factor": 1.24
+  },
+  "tasks": [
+    {
+      "id": "task_01",
+      "title": "Verificar Porta da API no Config",
+      "category": "inspection",
+      "prompt": "listar e verificar arquivo config.json e procurar por PORT ou HOST",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 4020,
+        "latency_ms": 1150
+      },
+      "heuristic": {
+        "initial_tier": "low",
+        "final_tier": "low",
+        "escalated": false,
+        "tokens": 643,
+        "savings_pct": 84.0,
+        "decision_ms": 2.37,
+        "total_latency_ms": 370,
+        "subagent": "task-runner-low"
+      },
+      "kev": {
+        "initial_tier": "low",
+        "final_tier": "low",
+        "escalated": false,
+        "tokens": 643,
+        "savings_pct": 84.0,
+        "decision_ms": 402.14,
+        "total_latency_ms": 770,
+        "subagent": "task-runner-low"
+      }
+    },
+    {
+      "id": "task_02",
+      "title": "Grep por Imports Depreciados",
+      "category": "inspection",
+      "prompt": "grep por 'react-router-dom/v5' em todos os arquivos da pasta src/",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 5510,
+        "latency_ms": 1420
+      },
+      "heuristic": {
+        "initial_tier": "low",
+        "final_tier": "low",
+        "escalated": false,
+        "tokens": 881,
+        "savings_pct": 84.0,
+        "decision_ms": 0.16,
+        "total_latency_ms": 454,
+        "subagent": "task-runner-low"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 2479,
+        "savings_pct": 55.0,
+        "decision_ms": 239.63,
+        "total_latency_ms": 1062,
+        "subagent": "task-runner-medium"
+      }
+    },
+    {
+      "id": "task_03",
+      "title": "Correção de Typo em README",
+      "category": "quick_edit",
+      "prompt": "pequeno ajuste de typo e sintaxe na seção de instalação do README.md",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 3080,
+        "latency_ms": 980
+      },
+      "heuristic": {
+        "initial_tier": "low",
+        "final_tier": "low",
+        "escalated": false,
+        "tokens": 492,
+        "savings_pct": 84.0,
+        "decision_ms": 0.16,
+        "total_latency_ms": 313,
+        "subagent": "task-runner-low"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 1386,
+        "savings_pct": 55.0,
+        "decision_ms": 234.14,
+        "total_latency_ms": 802,
+        "subagent": "task-runner-medium"
+      }
+    },
+    {
+      "id": "task_04",
+      "title": "Implementar Endpoint de Autenticação JWT",
+      "category": "implementation",
+      "prompt": "implementar novo controller POST /api/auth/login com validação de credenciais e hash bcrypt",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 9250,
+        "latency_ms": 3200
+      },
+      "heuristic": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 4162,
+        "savings_pct": 55.0,
+        "decision_ms": 0.18,
+        "total_latency_ms": 1855,
+        "subagent": "task-runner-medium"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 4162,
+        "savings_pct": 55.0,
+        "decision_ms": 229.79,
+        "total_latency_ms": 2084,
+        "subagent": "task-runner-medium"
+      }
+    },
+    {
+      "id": "task_05",
+      "title": "Criar Testes de Integração para Carrinho",
+      "category": "implementation",
+      "prompt": "criar testes unitários e de integração para a classe CartService cobrindo cupons e frete",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 10020,
+        "latency_ms": 3450
+      },
+      "heuristic": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 4509,
+        "savings_pct": 55.0,
+        "decision_ms": 0.18,
+        "total_latency_ms": 2000,
+        "subagent": "task-runner-medium"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 4509,
+        "savings_pct": 55.0,
+        "decision_ms": 229.28,
+        "total_latency_ms": 2229,
+        "subagent": "task-runner-medium"
+      }
+    },
+    {
+      "id": "task_06",
+      "title": "Refatoração de DTOs e Tipagem TypeScript",
+      "category": "implementation",
+      "prompt": "refatorar interfaces de produtos para DTOs com Zod schema e exportar tipos estritos",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 8100,
+        "latency_ms": 2890
+      },
+      "heuristic": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 3645,
+        "savings_pct": 55.0,
+        "decision_ms": 0.16,
+        "total_latency_ms": 1676,
+        "subagent": "task-runner-medium"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 3645,
+        "savings_pct": 55.0,
+        "decision_ms": 222.84,
+        "total_latency_ms": 1898,
+        "subagent": "task-runner-medium"
+      }
+    },
+    {
+      "id": "task_07",
+      "title": "Arquitetura e Redesign de Cluster Distribuído",
+      "category": "architecture",
+      "prompt": "reestruturar arquitetura do cluster de mensageria com migração de banco distribuído e auditoria de consistência",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 18300,
+        "latency_ms": 6800
+      },
+      "heuristic": {
+        "initial_tier": "high",
+        "final_tier": "high",
+        "escalated": false,
+        "tokens": 18300,
+        "savings_pct": 0.0,
+        "decision_ms": 0.33,
+        "total_latency_ms": 6800,
+        "subagent": "consultant-high"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 8235,
+        "savings_pct": 55.0,
+        "decision_ms": 225.55,
+        "total_latency_ms": 4168,
+        "subagent": "task-runner-medium"
+      }
+    },
+    {
+      "id": "task_08",
+      "title": "Auditoria de Segurança e Concorrência",
+      "category": "architecture",
+      "prompt": "auditoria de segurança de concorrência contra race conditions e vulnerabilidade de reentrância",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 15900,
+        "latency_ms": 5900
+      },
+      "heuristic": {
+        "initial_tier": "high",
+        "final_tier": "high",
+        "escalated": false,
+        "tokens": 15900,
+        "savings_pct": 0.0,
+        "decision_ms": 0.19,
+        "total_latency_ms": 5900,
+        "subagent": "consultant-high"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "medium",
+        "escalated": false,
+        "tokens": 7155,
+        "savings_pct": 55.0,
+        "decision_ms": 226.5,
+        "total_latency_ms": 3647,
+        "subagent": "task-runner-medium"
+      }
+    },
+    {
+      "id": "task_09",
+      "title": "Subagente Low com Incerteza (Escalonamento para Medium)",
+      "category": "escalation",
+      "prompt": "verifique por que o build está quebrando no módulo payment",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 7600,
+        "latency_ms": 2950
+      },
+      "heuristic": {
+        "initial_tier": "low",
+        "final_tier": "medium",
+        "escalated": true,
+        "tokens": 3932,
+        "savings_pct": 48.3,
+        "decision_ms": 0.14,
+        "total_latency_ms": 1967,
+        "subagent": "task-runner-medium"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "high",
+        "escalated": true,
+        "tokens": 8740,
+        "savings_pct": -15.0,
+        "decision_ms": 224.22,
+        "total_latency_ms": 3616,
+        "subagent": "consultant-high"
+      }
+    },
+    {
+      "id": "task_10",
+      "title": "Subagente Medium com Dilema (Escalonamento para High)",
+      "category": "escalation",
+      "prompt": "implementar cache global de sessões distribuídas",
+      "baseline": {
+        "tier": "high",
+        "model": "Gemini 3.8 Flash (High)",
+        "tokens": 13800,
+        "latency_ms": 5100
+      },
+      "heuristic": {
+        "initial_tier": "medium",
+        "final_tier": "high",
+        "escalated": true,
+        "tokens": 15869,
+        "savings_pct": -15.0,
+        "decision_ms": 0.12,
+        "total_latency_ms": 5865,
+        "subagent": "consultant-high"
+      },
+      "kev": {
+        "initial_tier": "medium",
+        "final_tier": "high",
+        "escalated": true,
+        "tokens": 15869,
+        "savings_pct": -15.0,
+        "decision_ms": 224.35,
+        "total_latency_ms": 6089,
+        "subagent": "consultant-high"
+      }
+    }
+  ]
+}

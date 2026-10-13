@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "projeto-antiback"
+version = "1.0.0"
+description = "Antigravity Tiered Model Router & Fallback System: 3-tier task routing, Jared Palmer's Kev decision model integration, and offline deterministic heuristic fallback."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Stanley" }
+]
+keywords = [
+    "antigravity",
+    "mcp",
+    "tiered-routing",
+    "ollama",
+    "kev",
+    "llm-optimization",
+    "tokens",
+    "agentic-ai",
+    "fallback-router"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+[project.urls]
+Homepage = "https://github.com/stanley/projeto_antiback"
+Documentation = "https://github.com/stanley/projeto_antiback#readme"
+Repository = "https://github.com/stanley/projeto_antiback.git"
+Issues = "https://github.com/stanley/projeto_antiback/issues"

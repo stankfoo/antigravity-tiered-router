@@ -1,0 +1,8 @@
+# Core MCP runtime uses standard library only (urllib, json, sys, os, re, typing)
+# No external pip dependencies required to run the tiered_router_mcp server!
+
+# Optional developer and testing dependencies:
+pytest>=7.4.0
+coverage>=7.3.0
+black>=23.9.0
+flake8>=6.1.0

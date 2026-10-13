@@ -1,0 +1,8 @@
+{
+  "name": "projeto-antiback",
+  "displayName": "Antigravity Tiered Router & Fallback (Projeto Antiback)",
+  "version": "1.0.0",
+  "description": "Tiered model fallback and delegation system for Antigravity IDE with local Kev decision model and resilient heuristic router.",
+  "author": "Stanley",
+  "license": "MIT"
+}
