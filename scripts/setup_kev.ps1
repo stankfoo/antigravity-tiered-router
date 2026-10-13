@@ -18,10 +18,10 @@ Write-Host "==========================================================" -Foregro
 $ollamaCmd = Get-Command ollama -ErrorAction SilentlyContinue
 if (-not $ollamaCmd) {
     Write-Host "[!] Ollama not found in PATH." -ForegroundColor Yellow
-    $altPath = "C:\Users\$env:USERNAME\AppData\Local\Programs\Ollama\ollama.exe"
+    $altPath = Join-Path $env:LOCALAPPDATA "Programs\Ollama\ollama.exe"
     if (Test-Path $altPath) {
         Write-Host "[OK] Found Ollama at $altPath" -ForegroundColor Green
-        $env:Path += ";C:\Users\$env:USERNAME\AppData\Local\Programs\Ollama"
+        $env:Path += ";" + (Join-Path $env:LOCALAPPDATA "Programs\Ollama")
     } else {
         Write-Host "[ERROR] Ollama is not installed. The router will continue running safely with the built-in local heuristic engine." -ForegroundColor Red
         return

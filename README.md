@@ -173,13 +173,13 @@ projeto_antiback/
 
 ### Método 1: Como Workspace Ativo (Recomendado)
 1. No Antigravity IDE, abra diretamente esta pasta:
-   `C:\Users\stanl\OneDrive\Documentos\projeto_antiback`
-2. O arquivo [GEMINI.md](file:///C:/Users/stanl/OneDrive/Documentos/projeto_antiback/GEMINI.md) e o [mcp_config.json](file:///C:/Users/stanl/OneDrive/Documentos/projeto_antiback/mcp_config.json) serão lidos automaticamente pela IDE.
+   a raiz do repositório clonado (`projeto_antiback`)
+2. O arquivo [GEMINI.md](./GEMINI.md) e o [mcp_config.json](./mcp_config.json) serão lidos automaticamente pela IDE.
 
 ### Método 2: Como Plugin Global
 Para disponibilizar o roteador em qualquer projeto que você abrir no Antigravity:
 1. Copie esta pasta para o diretório de plugins globais:
-   `C:\Users\<usuario>\.gemini\config\plugins\projeto_antiback`
+   `%USERPROFILE%\.gemini\config\plugins\projeto-antiback`
 2. O Antigravity carregará as ferramentas MCP e os 3 subagentes automaticamente em qualquer sessão.
 
 ---
