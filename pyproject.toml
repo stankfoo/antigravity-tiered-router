@@ -37,7 +37,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/stanley/projeto_antiback"
-Documentation = "https://github.com/stanley/projeto_antiback#readme"
-Repository = "https://github.com/stanley/projeto_antiback.git"
-Issues = "https://github.com/stanley/projeto_antiback/issues"
+Homepage = "https://github.com/stankfoo/antigravity-tiered-router"
+Documentation = "https://github.com/stankfoo/antigravity-tiered-router#readme"
+Repository = "https://github.com/stankfoo/antigravity-tiered-router.git"
+Issues = "https://github.com/stankfoo/antigravity-tiered-router/issues"

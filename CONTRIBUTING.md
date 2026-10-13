@@ -9,7 +9,7 @@ Agradecemos pelo interesse em contribuir para o sistema de roteamento em camadas
 
 ### 1. Clonar e Configurar o Repositório
 ```bash
-git clone https://github.com/seu-usuario/projeto_antiback.git
+git clone https://github.com/stankfoo/antigravity-tiered-router.git
 cd projeto_antiback
 ```
 
