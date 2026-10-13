@@ -5,6 +5,7 @@
 [![Decision Engine](https://img.shields.io/badge/Decision_Engine-Kev_System_One_(0.8B)_+_Heuristic-059669?style=flat-square)](https://huggingface.co/ggml-org/Kev-0.8B-GGUF)
 [![Token Savings](https://img.shields.io/badge/Token_Savings-Up_to_84%25-10b981?style=flat-square)](./benchmarks/deep_audit_results.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square)](./LICENSE)
+[![Architecture](https://img.shields.io/badge/Architecture-Modular_%26_Agnostic-8b5cf6?style=flat-square)](#-modular-architecture--custom-model-triads)
 
 [English](#overview) | [Português](#visão-geral-pt-br)
 
@@ -71,6 +72,67 @@ flowchart TD
 | **Tier 1 (Low)** | Gemini 3.8 Flash (Low) | `task-runner-low` | Read-only tasks, file search, grep, syntax checks, log inspection, documentation typos. | **~84% savings** |
 | **Tier 2 (Medium)** | Gemini 3.8 Flash (Medium) | `task-runner-medium` | Feature development, writing endpoints, unit tests, bug fixes, localized refactoring. | **~55% savings** |
 | **Tier 3 (High)** | Gemini 3.8 Flash (High) | `consultant-high` | System architecture, distributed consensus, security audits, database migrations. | Baseline (Full reasoning) |
+
+---
+
+## 🧩 Modular Architecture & Custom Model Triads
+
+The router's core innovation is **semantic tier decoupling**: the decision engine (Kev-0.8B and the heuristic fallback) does **not** evaluate vendor-specific model names; it evaluates the **intrinsic complexity of the task** (code changes, blast radius, read vs. write, ambiguity).
+
+Tasks are classified into three abstract capability bands:
+- **Tier 1 (Low)**: Read-only, inspection, localized grep, single-line patches, syntax checks.
+- **Tier 2 (Medium)**: Feature creation, endpoint development, standard bug fixing, unit tests.
+- **Tier 3 (High)**: Architectural design, distributed systems, deep security audits, deadlocks.
+
+This abstraction makes the architecture **100% provider-agnostic**. While the default distribution maps these tiers to **Gemini 3.8 Flash (Low / Med / High)**, you can configure any model triad in minutes:
+
+### Example Triad Configurations
+
+| Provider / Strategy | Tier 1 (Low Runner) | Tier 2 (Medium Executor) | Tier 3 (High Consultant) | Ideal For |
+| :--- | :--- | :--- | :--- | :--- |
+| **Default (Google)** | Gemini 3.8 Flash (Low) | Gemini 3.8 Flash (Medium) | Gemini 3.8 Flash (High) / Pro | Zero setup, out-of-the-box Antigravity IDE |
+| **Anthropic Claude** | `claude-3-5-haiku-latest` | `claude-3-5-sonnet-latest` | `claude-3-opus-latest` | High-precision coding and refactoring |
+| **OpenAI** | `gpt-4o-mini` | `gpt-4o` | `o1` or `o3-mini` | Deep reasoning and mathematical verification |
+| **100% Local (Ollama)** | `qwen2.5-coder:1.5b` | `qwen2.5-coder:7b` | `deepseek-r1:14b` or `llama3.3:70b` | Air-gapped, zero cloud cost, 100% privacy |
+| **Hybrid Zero-Cost** | Local Ollama (0 tokens) | Gemini 3.8 Flash (Low cost) | Claude 3.5 Sonnet / Gemini Pro | Maximum token optimization |
+
+---
+
+### How to Swap Models (Step-by-Step)
+
+Swapping models requires **zero code changes in the router engine**:
+
+#### 1. Update Subagent Definitions (`agents/*.md`)
+Open the subagent markdown files in `agents/` and modify the `model:` property in the YAML frontmatter:
+
+- **[`agents/task-runner-low.md`](./agents/task-runner-low.md)**:
+  ```yaml
+  model: claude-3-5-haiku-latest  # or gpt-4o-mini, qwen2.5-coder:1.5b
+  ```
+- **[`agents/task-runner-medium.md`](./agents/task-runner-medium.md)**:
+  ```yaml
+  model: claude-3-5-sonnet-latest # or gpt-4o, qwen2.5-coder:7b
+  ```
+- **[`agents/consultant-high.md`](./agents/consultant-high.md)**:
+  ```yaml
+  model: claude-3-opus-latest    # or o1, deepseek-r1:14b
+  ```
+
+#### 2. Update Governance Rule (`rules/tiered_escalation.md`)
+Update the table in [`rules/tiered_escalation.md`](./rules/tiered_escalation.md) to reflect your chosen models so the primary orchestrator understands the capabilities assigned to each tier.
+
+#### 3. (Optional) Custom Model Metadata in MCP Server (`server/tiered_router_mcp.py`)
+To expose explicit model identifiers in the JSON-RPC response, you can map `recommended_model` in `classify_and_route_task`:
+```python
+model_mapping = {
+    "low": "claude-3-5-haiku-latest",
+    "medium": "claude-3-5-sonnet-latest",
+    "high": "claude-3-opus-latest",
+}
+```
+
+#### 4. (Optional) Update Dashboard Labels (`dashboard/app.js`)
+Update the card titles and cost multiplier metrics in `dashboard/app.js` if you want the telemetry dashboard to reflect custom pricing per million tokens.
 
 ---
 
@@ -154,6 +216,15 @@ O **Antigravity Tiered Router (Projeto Antiback)** é uma arquitetura de roteame
 2. **Motor Heurístico Determinístico**: Fallback instantâneo offline (0,2 ms) caso o daemon local esteja indisponível.
 3. **Protocolo Antiback Ativo**: Se um subagente encontra uma exceção ou incerteza durante a execução, ele aciona a ferramenta `evaluate_task_uncertainty` e é promovido automaticamente ao modelo sênior com todo o contexto preservado.
 4. **Economia Real Comprovada**: Até **84% de redução de tokens** em inspeções e **26,7% de economia líquida** no portfólio completo de desenvolvimento.
+
+### 🧩 Suporte a Qualquer Família de Modelos (Arquitetura Modular)
+O Kev-0.8B classifica tarefas por **complexidade intrínseca** (leitura vs. implementação vs. arquitetura) e não pelo nome comercial da API. Isso significa que você pode trocar a família padrão por qualquer fornecedor:
+- **Anthropic Claude**: Haiku (Low) ➔ Sonnet (Med) ➔ Opus (High)
+- **OpenAI**: GPT-4o-mini (Low) ➔ GPT-4o (Med) ➔ o1 / o3-mini (High)
+- **100% Local (Ollama)**: Qwen 1.5B (Low) ➔ Qwen 7B (Med) ➔ DeepSeek-R1 / Llama 70B (High)
+- **Híbrido Custo Zero**: Ollama Local (0 tokens) ➔ Gemini Flash (Med) ➔ Claude Opus (High)
+
+Basta alterar a propriedade `model:` no cabeçalho YAML dos arquivos em `agents/` (`task-runner-low.md`, `task-runner-medium.md`, `consultant-high.md`). O roteador e o fallback funcionam imediatamente sem necessidade de retreinar o Kev!
 
 ---
 
