@@ -1,243 +1,197 @@
-# 🚀 Projeto Antiback: Antigravity Tiered Router & Fallback System
+# Antigravity Tiered Router & Fallback System (Projeto Antiback)
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Antigravity_IDE-Plugin_Ready-blue?style=for-the-badge&logo=google" alt="Antigravity IDE Ready">
-  <img src="https://img.shields.io/badge/Model_Support-Gemini_3.8_Flash_(Low/Med/High)-purple?style=for-the-badge" alt="Gemini Models">
-  <img src="https://img.shields.io/badge/Decision_Engine-Kev_System_One_+_Heuristic-emerald?style=for-the-badge" alt="Kev & Heuristic">
-  <img src="https://img.shields.io/badge/Token_Savings-Up_to_84%25-brightgreen?style=for-the-badge" alt="Token Savings">
-  <img src="https://img.shields.io/badge/License-MIT-orange?style=for-the-badge" alt="License MIT">
-</p>
+[![Antigravity Plugin](https://img.shields.io/badge/Antigravity_IDE-Plugin_Ready-blue?style=flat-square&logo=google)](./plugin.json)
+[![Models](https://img.shields.io/badge/Model_Support-Gemini_3.8_Flash_(Low/Med/High)-6f42c1?style=flat-square)](./rules/tiered_escalation.md)
+[![Decision Engine](https://img.shields.io/badge/Decision_Engine-Kev_System_One_(0.8B)_+_Heuristic-059669?style=flat-square)](https://huggingface.co/ggml-org/Kev-0.8B-GGUF)
+[![Token Savings](https://img.shields.io/badge/Token_Savings-Up_to_84%25-10b981?style=flat-square)](./benchmarks/deep_audit_results.json)
+[![License: MIT](https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square)](./LICENSE)
 
-O **Projeto Antiback (Antigravity Tiered Router)** é uma arquitetura completa de **roteamento inteligente em camadas (Tiered Escalation)**, **avaliação de incerteza em tempo de execução** e **telemetria visual** para o **Google Antigravity IDE**.
-
-Ele resolve o principal gargalo de assistentes agentic de codificação: **o desperdício massivo de tokens e latência** ao enviar tarefas simples (leitura de arquivos, grep, sintaxe, pequenos ajustes) para o modelo topo de linha mais pesado.
+[English](#overview) | [Português](#visão-geral-pt-br)
 
 ---
 
-## 📑 Sumário
+## Overview
 
-- [Visão Geral da Arquitetura](#-visão-geral-da-arquitetura)
-- [As 3 Camadas Operacionais (Tiers)](#-as-3-camadas-operacionais-tiers)
-- [Motor Híbrido de Decisão (Kev + Heurística)](#-motor-híbrido-de-decisão-kev--heurística)
-- [Resultados Empíricos de Benchmark](#-resultados-empíricos-de-benchmark)
-- [Dashboard Visual e Telemetria](#-dashboard-visual-e-telemetria)
-- [Estrutura do Repositório](#-estrutura-do-repositório)
-- [Como Instalar e Usar no Antigravity](#-como-instalar-e-usar-no-antigravity)
-- [Referência das Ferramentas MCP](#-referência-das-ferramentas-mcp)
-- [Testes e Validação](#-testes-e-validação)
-- [Licença e Contribuição](#-licença-e-contribuição)
+**Antigravity Tiered Router** is an intelligent task classification and model delegation proxy for the **Google Antigravity IDE**. It mitigates inference token consumption and response latency by dynamically routing development tasks across tiered LLM execution profiles (**Gemini 3.8 Flash Low, Medium, and High**) using a local, single-forward-pass decision model (**Kev-0.8B**) with a deterministic offline heuristic fallback.
+
+Unlike traditional static proxies, it incorporates an **active runtime uncertainty fallback protocol (Antiback)**: if a delegated subagent encounters ambiguity, syntax errors, or missing dependencies during execution, it self-evaluates uncertainty and seamlessly escalates to the senior tier with full contextual preservation.
+
+### Key Capabilities
+- **Zero-Token Neural Triage**: Uses Jared Palmer's native **Kev-0.8B** decision model via Ollama's `/v1/systemone` endpoint. It produces calibrated choice probabilities in a single forward pass without autoregressive token generation.
+- **Deterministic Heuristic Engine**: Sub-millisecond (0.2 ms) offline regex boundary parser acting as an instant failover if the local Ollama daemon is offline.
+- **Active Antiback Protocol**: Continuous self-assessment tool (`evaluate_task_uncertainty`) preventing subagent loops and hallucinatory retries.
+- **Measurable Token Economy**: Yields **26.7% to 84% token savings** across typical day-to-day software engineering tasks.
+- **Telemetry Dashboard**: Built-in real-time monitoring interface served locally on port 8085.
 
 ---
 
-## 🏗️ Visão Geral da Arquitetura
-
-O sistema implementa um fluxo de triagem não-obstrutivo integrado via **Model Context Protocol (MCP)**:
+## Architecture Lifecycle
 
 ```mermaid
-flowchart TD
-    User([👤 Solicitação do Usuário]) --> Classifier{⚡ classify_and_route_task}
-    
-    Classifier -->|Inspeção, Grep, Typo| Low[🌱 Tier 1: task-runner-low\nGemini 3.8 Flash Low]
-    Classifier -->|Implementação, Testes, Refactor| Med[⚙️ Tier 2: task-runner-medium\nGemini 3.8 Flash Medium]
-    Classifier -->|Arquitetura, Segurança, Auditoria| High[👑 Tier 3: consultant-high\nGemini 3.8 Flash High]
+sequenceDiagram
+    autonumber
+    actor Dev as Developer / Orchestrator
+    participant Router as MCP: classify_and_route_task
+    participant Engine as Decision Engine (Kev / Heuristic)
+    participant Subagent as Delegated Subagent (Low / Medium)
+    participant Fallback as MCP: evaluate_task_uncertainty
+    participant Senior as Senior Consultant (High)
 
-    Low --> UncLow{evaluate_task_uncertainty\nHouve Incerteza / Erro?}
-    UncLow -->|Não: Concluído com Sucesso| Done([✅ Tarefa Concluída])
-    UncLow -->|Sim: Incerteza / Traceback| EscMed[⚡ Escalonamento Automático\nLow ➔ Medium]
-    EscMed --> Med
-
-    Med --> UncMed{evaluate_task_uncertainty\nDilema Arquitetural?}
-    UncMed -->|Não: Concluído com Sucesso| Done
-    UncMed -->|Sim: Dilema / Impasse| EscHigh[🏛️ format_high_consultation\nMedium ➔ High]
-    EscHigh --> High
-
-    High --> Done
+    Dev->>Router: Prompt: "Create user endpoint and test"
+    Router->>Engine: Run single forward pass (/v1/systemone)
+    Engine-->>Router: Choice: MEDIUM (P=0.75, 0 tokens)
+    Router-->>Dev: Delegate to task-runner-medium
+    Dev->>Subagent: Execute implementation task
+    alt Successful Execution
+        Subagent-->>Dev: Implementation verified & committed
+    else Uncertainty / Syntax Error Detected
+        Subagent->>Fallback: evaluate_task_uncertainty(log, errors)
+        Fallback-->>Subagent: Recommendation: ESCALATE (Score > 0.65)
+        Subagent->>Senior: Handover context via format_high_consultation
+        Senior->>Senior: Resolve architectural roadblock
+        Senior-->>Dev: Verified completion
+    end
 ```
 
 ---
 
-## 🎯 As 3 Camadas Operacionais (Tiers)
+## The 3 Operational Tiers
 
-| Camada | Subagente | Modelo Sugerido | Escopo de Atuação | Economia Típica |
-| :--- | :--- | :--- | :--- | :--- |
-| **Tier 1 (Low)** | `task-runner-low` | Gemini 3.8 Flash (Low) | Inspeções de arquivos, buscas com grep, validação de sintaxe, leitura de logs, pequenos ajustes de 1 linha. Auto-avalia incerteza. | **~84% economia** |
-| **Tier 2 (Medium)** | `task-runner-medium` | Gemini 3.8 Flash (Medium) | Desenvolvimento principal, criação de rotas REST, testes unitários, refatoração de código e resolução de bugs. | **~55% economia** |
-| **Tier 3 (High)** | `consultant-high` | Gemini 3.8 Flash (High) | Oráculo de arquitetura, consultor de concorrência/segurança, resolução de impasses técnicos e fallback definitivo. | Capacidade total |
-
----
-
-## ⚡ Motor Híbrido de Decisão (Kev + Heurística)
-
-O roteador utiliza uma estratégia em duas frentes para **garantir latência nula e custo zero de tokens na nuvem**:
-
-1. **Decisão Neural System One (Kev via Ollama)**:
-   - Baseado no modelo **Kev** de Jared Palmer.
-   - Modelo de classificação de uma única passagem (`single prefill pass`), **sem geração autoregressiva de texto**.
-   - Responde em **~30ms** localmente através da API `/v1/systemone` do Ollama sem consumir nenhum token da sua quota.
-2. **Motor Heurístico Determinístico Offline (Zero-Latency Fallback)**:
-   - Se o Ollama estiver desligado ou em manutenção, o servidor MCP ativa instantaneamente o analisador semântico local com regex de fronteira (`\bword\b`).
-   - Latência média de apenas **0,2 ms**, consumo de RAM desprezível e 100% de disponibilidade offline.
+| Tier | Assigned Model | Subagent Persona | Target Task Scope | Token Economy |
+| :--- | :--- | :--- | :--- | :---: |
+| **Tier 1 (Low)** | Gemini 3.8 Flash (Low) | `task-runner-low` | Read-only tasks, file search, grep, syntax checks, log inspection, documentation typos. | **~84% savings** |
+| **Tier 2 (Medium)** | Gemini 3.8 Flash (Medium) | `task-runner-medium` | Feature development, writing endpoints, unit tests, bug fixes, localized refactoring. | **~55% savings** |
+| **Tier 3 (High)** | Gemini 3.8 Flash (High) | `consultant-high` | System architecture, distributed consensus, security audits, database migrations. | Baseline (Full reasoning) |
 
 ---
 
-## 📊 Resultados Empíricos de Benchmark
+## State of the Art Comparison
 
-Executamos uma bateria padronizada de **10 cenários reais de desenvolvimento** comparando o comportamento **Monolítico (Sempre High)** contra o **Tiered Router**:
-
-| ID | Cenário / Tarefa | Categoria | Baseline (High) | Router (Tiered) | Economia | Latência | Status |
-| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
-| `task_01` | Verificar Porta da API no Config | Inspeção | 4.020 tok | 643 tok | **-84,0%** | 369 ms | ✓ Direto (Low) |
-| `task_02` | Grep por Imports Depreciados | Inspeção | 5.510 tok | 881 tok | **-84,0%** | 454 ms | ✓ Direto (Low) |
-| `task_03` | Correção de Typo em README | Edição Simples | 3.080 tok | 492 tok | **-84,0%** | 313 ms | ✓ Direto (Low) |
-| `task_04` | Implementar Endpoint JWT | Implementação | 9.250 tok | 4.162 tok | **-55,0%** | 1.855 ms | ✓ Direto (Med) |
-| `task_05` | Testes de Integração para Carrinho | Implementação | 10.020 tok | 4.509 tok | **-55,0%** | 2.000 ms | ✓ Direto (Med) |
-| `task_06` | Refatoração de DTOs e Tipagem | Implementação | 8.100 tok | 3.645 tok | **-55,0%** | 1.676 ms | ✓ Direto (Med) |
-| `task_07` | Arquitetura de Cluster Distribuído | Arquitetura | 18.300 tok | 18.300 tok | **0,0%** | 6.800 ms | ✓ Direto (High) |
-| `task_08` | Auditoria de Concorrência e Mutex | Arquitetura | 15.900 tok | 15.900 tok | **0,0%** | 5.900 ms | ✓ Direto (High) |
-| `task_09` | Low com Incerteza (TypeError) | Escalonamento | 7.600 tok | 3.932 tok | **-48,3%** | 1.967 ms | ⚡ Escalado (Low ➔ Med) |
-| `task_10` | Medium com Dilema Arquitetural | Escalonamento | 13.800 tok | 15.869 tok | **+15,0%** | 5.865 ms | ⚡ Escalado (Med ➔ High) |
-
-### Consolidação Global:
-- **Tokens economizados**: **27.247 tokens** (**-28,5% de redução global**).
-- **Aceleração de resposta**: **1,24x mais rápido** (27,2s vs. 33,8s).
-- **Precisão de escalonamento**: **100% de detecção de falhas e hesitações** sem travamentos.
+| Project | Scope & Target | Decision Mechanism | Runtime Uncertainty Detection | Native IDE Plugin |
+| :--- | :--- | :--- | :---: | :---: |
+| **RouteLLM** (LMSYS) | Generic Web Chatbot (API Proxy) | Elo Preference / BERT | No | No (Python client only) |
+| **FrugalGPT** (Stanford) | Theoretical Model Cascade | Linear scoring / cascade | No (Post-failure only) | No |
+| **tierdecay** | Quota / Token Analytics | Historical log heuristics | No | Passive metric tracking |
+| **jaredpalmer/kev** | Standalone Decision Model | LoRA + Pointer Head (Qwen base) | No (Inference only) | No |
+| **Antigravity Tiered Router** | **Google Antigravity IDE** | **Kev-0.8B (Q8_0) + Heuristic Fallback** | **Yes (Active Antiback Protocol)** | **Full Plugin (MCP + Rules + Subagents)** |
 
 ---
 
-## 🖥️ Dashboard Visual e Telemetria
+## Benchmark & Audit Results
 
-O repositório inclui um dashboard completo construído com estética dark mode glassmorphic, visualização de dados e simulador interativo em tempo real:
+Consolidated from the 25-scenario deep audit test suite (`tests/deep_audit_tiered_router.py`):
 
-- **Cards de KPI**: Indicadores de tokens poupados, aceleração e tempo de decisão do roteador.
-- **Gráfico Comparativo de Barras**: Consumo de tokens tarefa a tarefa.
-- **Simulador Interativo em Tempo Real**: Digite qualquer comando e veja as 4 etapas da pipeline tomarem a decisão instantaneamente.
-- **Tabela com Filtros de Categoria**: Inspeção, Edição, Implementação, Arquitetura e Escalonamento.
+| Metric | Result | Target Benchmark |
+| :--- | :---: | :---: |
+| **Initial Triage Accuracy** | **100.0%** (25/25) | > 95% |
+| **Uncertainty Capture Rate (Recall)** | **100.0%** (4/4) | 100% |
+| **False Escalation Rate** | **0.0%** (0 false positives) | < 5% |
+| **Overall Token Reduction** | **-26.7%** (62,253 tokens saved) | -20% to -40% |
+| **Routing Decision Overhead** | **0.23 ms** (Heuristic) / **32 ms** (Kev) | < 100 ms |
+| **Cloud Tokens Consumed by Router** | **0 tokens** | 0 tokens |
 
-### Como abrir o dashboard:
-Execute o script PowerShell incluso:
+---
+
+## Quickstart
+
+### Prerequisites
+- Python 3.9+
+- [Ollama](https://ollama.com/) (version 0.40.4-rc1 or newer for native decision model support)
+
+### 1. Setup Kev Decision Model
+Run the setup utility to configure the official `Kev-0.8B-Q8_0.gguf` checkpoint into Ollama:
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/setup_kev.ps1
+```
+
+### 2. Run Unit Tests
+```bash
+python -m unittest tests/test_router.py
+```
+
+### 3. Run Deep Audit Benchmark
+```bash
+python tests/deep_audit_tiered_router.py
+```
+
+### 4. Launch Telemetry Dashboard
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/start_dashboard.ps1
 ```
-Ou inicie manualmente via Python:
-```bash
-python -m http.server 8085 --directory dashboard
-```
-E acesse `http://localhost:8085` no seu navegador.
+Open `http://localhost:8085` in your browser.
 
 ---
 
-## 📂 Estrutura do Repositório
+## Antigravity IDE Integration
+
+### Option A: Global Plugin (Recommended)
+Copy the repository into your global Antigravity customizations directory:
+- **Windows:** `%USERPROFILE%\.gemini\config\plugins\projeto-antiback`
+- **Linux / macOS:** `~/.gemini/config/plugins/projeto-antiback`
+
+The IDE automatically registers the MCP tools and subagent escalation rules across all workspaces.
+
+### Option B: Local Workspace
+Open this directory directly as your active Antigravity workspace. The [`GEMINI.md`](./GEMINI.md) and [`mcp_config.json`](./mcp_config.json) manifests are recognized automatically.
+
+---
+
+## Visão Geral (PT-BR)
+
+O **Antigravity Tiered Router (Projeto Antiback)** é uma arquitetura de roteamento de tarefas e contingência ativa para o **Google Antigravity IDE**. O projeto elimina o desperdício de tokens e latência ao direcionar cada tarefa de desenvolvimento para o nível correto de modelo (Gemini 3.8 Flash Low, Medium ou High).
+
+### Destaques Técnicos:
+1. **Triagem em 1 Passada com 0 Tokens**: Utiliza o modelo neural Kev-0.8B de Jared Palmer localmente via endpoint `/v1/systemone` do Ollama, retornando probabilidades matemáticas exatas sem gerar texto token por token.
+2. **Motor Heurístico Determinístico**: Fallback instantâneo offline (0,2 ms) caso o daemon local esteja indisponível.
+3. **Protocolo Antiback Ativo**: Se um subagente encontra uma exceção ou incerteza durante a execução, ele aciona a ferramenta `evaluate_task_uncertainty` e é promovido automaticamente ao modelo sênior com todo o contexto preservado.
+4. **Economia Real Comprovada**: Até **84% de redução de tokens** em inspeções e **26,7% de economia líquida** no portfólio completo de desenvolvimento.
+
+---
+
+## Repository Structure
 
 ```text
 projeto_antiback/
-├── .github/
-│   └── workflows/
-│       └── ci.yml               # CI do GitHub Actions (testes em Linux, Windows e macOS)
-├── .gitignore                   # Regras de exclusão para Python, Node, SO e IDEs
-├── LICENSE                      # Licença de código aberto MIT
-├── README.md                    # Documentação completa do projeto
-├── CONTRIBUTING.md             # Guia de contribuição para a comunidade
-├── pyproject.toml               # Metadados padrão de empacotamento Python
-├── requirements.txt             # Dependências de desenvolvimento e testes
-├── GEMINI.md                    # Diretrizes de workspace para o Antigravity IDE
-├── plugin.json                  # Manifesto oficial do plugin Antigravity
-├── mcp_config.json              # Configuração de registro do servidor MCP
-├── server/
-│   ├── __init__.py
-│   └── tiered_router_mcp.py     # Servidor MCP JSON-RPC 2.0 (stdio)
-├── agents/
-│   ├── task-runner-low.md       # Definição e prompt do subagente Tier 1 (Low)
-│   ├── task-runner-medium.md    # Definição e prompt do subagente Tier 2 (Medium)
-│   └── consultant-high.md       # Definição e prompt do subagente Tier 3 (High)
-├── rules/
-│   └── tiered_escalation.md     # Regra de governança de triagem e fallback
-├── benchmarks/
-│   ├── run_benchmark.py         # Script de execução da bateria de 10 cenários
-│   └── benchmark_results.json   # Base de dados dos resultados consolidados
-├── dashboard/
-│   ├── index.html               # Interface do dashboard de telemetria
-│   ├── styles.css               # Design system glassmorphic moderno
-│   └── app.js                   # Lógica interativa do simulador e gráficos
-├── scripts/
-│   ├── setup_kev.ps1            # Diagnóstico e setup do Ollama Kev
-│   ├── start_dashboard.ps1      # Inicializador com um clique do dashboard
-│   └── run_tests.ps1            # Executor automatizado de testes e benchmark
-└── tests/
-    ├── __init__.py
-    └── test_router.py           # Suíte de 8 testes unitários e de integração
+├── .github/workflows/ci.yml       # Automated GitHub Actions test workflow
+├── agents/                        # Antigravity subagent persona definitions
+│   ├── task-runner-low.md         # Tier 1 runner (Gemini 3.8 Flash Low)
+│   ├── task-runner-medium.md      # Tier 2 runner (Gemini 3.8 Flash Medium)
+│   └── consultant-high.md         # Tier 3 consultant (Gemini 3.8 Flash High)
+├── benchmarks/                    # Empirical benchmark suite and telemetry data
+│   ├── benchmark_results.json     # Standard 10-task benchmark data
+│   ├── deep_audit_results.json    # 25-scenario deep audit metrics
+│   └── run_benchmark.py           # Benchmark execution runner
+├── dashboard/                     # Dark-mode glassmorphic telemetry dashboard
+│   ├── index.html                 # Dashboard UI
+│   ├── styles.css                 # Clean CSS token design system
+│   └── app.js                     # Live chart and interactive simulator logic
+├── rules/                         # Operational rules for Antigravity IDE
+│   └── tiered_escalation.md       # Core escalation and handover contract
+├── scripts/                       # Turnkey automation utilities
+│   ├── run_tests.ps1              # Test runner script
+│   ├── setup_kev.ps1              # Ollama and Kev-0.8B automated setup
+│   └── start_dashboard.ps1        # Local telemetry server launcher
+├── server/                        # MCP JSON-RPC Server
+│   ├── __init__.py                # Server package marker
+│   └── tiered_router_mcp.py       # Core router engine and MCP tools
+├── skills/tiered-router/          # Antigravity workflow skill instructions
+│   └── SKILL.md                   # Operational procedures for IDE agents
+├── tests/                         # Unit tests and deep stress validation
+│   ├── test_router.py             # 8 unit tests for MCP protocol and triage
+│   └── deep_audit_tiered_router.py # 25 adversarial and stress scenarios
+├── CONTRIBUTING.md                # Open source contribution guidelines
+├── GEMINI.md                      # Antigravity workspace instructions
+├── LICENSE                        # MIT Open Source License
+├── mcp_config.json                # MCP server configuration manifest
+├── Modelfile                      # Ollama Modelfile for Kev-0.8B
+├── plugin.json                    # Antigravity plugin manifest
+├── pyproject.toml                 # Standard PEP 517/621 packaging metadata
+├── README.md                      # Technical documentation
+└── requirements.txt               # Development dependencies
 ```
 
 ---
 
-## 🚀 Como Instalar e Usar no Antigravity
+## License
 
-### Método 1: Como Workspace Ativo (Recomendado)
-1. No Antigravity IDE, abra diretamente esta pasta:
-   a raiz do repositório clonado (`projeto_antiback`)
-2. O arquivo [GEMINI.md](./GEMINI.md) e o [mcp_config.json](./mcp_config.json) serão lidos automaticamente pela IDE.
-
-### Método 2: Como Plugin Global
-Para disponibilizar o roteador em qualquer projeto que você abrir no Antigravity:
-1. Copie esta pasta para o diretório de plugins globais:
-   `%USERPROFILE%\.gemini\config\plugins\projeto-antiback`
-2. O Antigravity carregará as ferramentas MCP e os 3 subagentes automaticamente em qualquer sessão.
-
----
-
-## 🛠️ Referência das Ferramentas MCP
-
-O servidor MCP expõe 4 ferramentas universais:
-
-### 1. `classify_and_route_task(prompt, context)`
-Avalia o objetivo da tarefa e retorna a camada recomendada (`low`, `medium` ou `high`), o subagente correspondente e a economia estimada.
-
-### 2. `evaluate_task_uncertainty(subagent_output, current_tier)`
-Analisa o log ou resposta gerada por um subagente. Detecta automaticamente sinais de hesitação, dúvidas, erros de execução (`SyntaxError`, `TypeError`, falhas em testes) e aciona o escalonamento para o próximo tier (`Low ➔ Medium` ou `Medium ➔ High`).
-
-### 3. `format_high_consultation(task, current_findings, dilemma)`
-Formata um dossiê técnico de consulta quando o executor `Medium` precisa de orientação arquitetural do consultor sênior `High`.
-
-### 4. `get_tier_status()`
-Retorna a saúde do Ollama local, a disponibilidade do modelo Kev e o status do motor heurístico offline.
-
----
-
-## 🧪 Testes e Validação
-
-Execute a suíte completa de testes unitários:
-```bash
-python tests/test_router.py
-```
-Todos os 8 testes cobrem handshakes JSON-RPC, classificação semântica, tolerância a incerteza e escalonamento de subagentes.
-
-Para executar o benchmark completo e atualizar o banco de dados:
-```bash
-python benchmarks/run_benchmark.py
-```
-
----
-
-
----
-
-## 🔍 Comparativo com o Estado da Arte no GitHub
-
-Como o **Projeto Antiback** se compara a outros projetos de roteamento e otimização de LLMs no GitHub:
-
-| Projeto | Alvo / Escopo | Motor de Decisão | Detecção Ativa de Incerteza | Integração Nativa IDE |
-| :--- | :--- | :--- | :---: | :---: |
-| **RouteLLM** (LMSYS) | Chatbot genérico (API Proxy) | Elo Preference / BERT | ❌ Não | ❌ Não (apenas wrapper OpenAI) |
-| **FrugalGPT** (Stanford) | Teórico / Cascata de Modelos | Heurística / Score linear | ❌ Apenas erro pós-fato | ❌ Não |
-| **tierdecay** | Análise de custos de repositório | Histórico de tarefas | ❌ Não | ⚠️ Passivo (apenas telemetria) |
-| **jaredpalmer/kev** | Biblioteca de Decision Model | LoRA + Pointer Head (Qwen) | ❌ Não (apenas inferência) | ❌ Não (apenas modelo cru) |
-| **Projeto Antiback** (Este Projeto) | **Google Antigravity IDE** | **Kev-0.8B Nativo (Q8_0) + Heurística** | **✓ Sim (Antiback Ativo em Execução)** | **✓ Plugin Global Completo (MCP + Rules + Subagentes)** |
-
-### O que torna este projeto pioneiro:
-1. **Primeiro Plugin Global do Antigravity com Roteamento Dinâmico**: Não é apenas um script de proxy, mas uma extensão nativa que se conecta diretamente ao ciclo de vida do agente no Antigravity (`classify_and_route_task`, `evaluate_task_uncertainty`).
-2. **Kev-0.8B Nativo Local (Single Forward Pass)**: Usa o modelo de decisão oficial de Jared Palmer (quantizado em `Q8_0` pela GGML, 812 MB) rodando na GPU local via Ollama (`/v1/systemone`). Ele gera **ZERO tokens de texto**, calculando apenas distribuições calibradas de probabilidade sem custo de API.
-3. **Mecanismo Ativo Antiback**: Se um subagente `Low` ou `Medium` encontra um erro de sintaxe, ambiguidade ou arquivo ausente durante a execução, ele aciona o protocolo de autoavaliação e é promovido automaticamente para o nível superior com todo o contexto preservado.
-
-
-## 📄 Licença
-
-Distribuído sob a licença **MIT**. Consulte o arquivo [LICENSE](./LICENSE) para obter mais informações.
+This project is licensed under the [MIT License](./LICENSE).
