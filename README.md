@@ -28,29 +28,38 @@ Unlike traditional static proxies, it incorporates an **active runtime uncertain
 ## Architecture Lifecycle
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor Dev as Developer / Orchestrator
-    participant Router as MCP: classify_and_route_task
-    participant Engine as Decision Engine (Kev / Heuristic)
-    participant Subagent as Delegated Subagent (Low / Medium)
-    participant Fallback as MCP: evaluate_task_uncertainty
-    participant Senior as Senior Consultant (High)
+flowchart TD
+    Prompt(["Developer / IDE Task Prompt"]):::promptBox --> Router{"MCP Router<br/><b>classify_and_route_task</b>"}:::routerBox
 
-    Dev->>Router: Prompt: "Create user endpoint and test"
-    Router->>Engine: Run single forward pass (/v1/systemone)
-    Engine-->>Router: Choice: MEDIUM (P=0.75, 0 tokens)
-    Router-->>Dev: Delegate to task-runner-medium
-    Dev->>Subagent: Execute implementation task
-    alt Successful Execution
-        Subagent-->>Dev: Implementation verified & committed
-    else Uncertainty / Syntax Error Detected
-        Subagent->>Fallback: evaluate_task_uncertainty(log, errors)
-        Fallback-->>Subagent: Recommendation: ESCALATE (Score > 0.65)
-        Subagent->>Senior: Handover context via format_high_consultation
-        Senior->>Senior: Resolve architectural roadblock
-        Senior-->>Dev: Verified completion
+    subgraph Decision_Engine ["Local Decision Engine (Zero Cloud Tokens)"]
+        direction TB
+        Kev["<b>Kev-0.8B Native</b><br/>/v1/systemone (Local GPU)<br/><i>Single forward pass</i>"]
+        Heur["<b>Heuristic Engine</b><br/>Deterministic Fallback<br/><i>0.2ms latency</i>"]
     end
+
+    Router <--> Decision_Engine
+
+    Router -->|"Simple / Read-Only<br/>(84% token savings)"| Low["<b>Tier 1: Low</b><br/>Gemini 3.8 Flash Low<br/><i>task-runner-low</i>"]:::lowBox
+    Router -->|"Standard Implementation<br/>(55% token savings)"| Med["<b>Tier 2: Medium</b><br/>Gemini 3.8 Flash Medium<br/><i>task-runner-medium</i>"]:::medBox
+    Router -->|"Architecture / Security<br/>(Baseline)"| High["<b>Tier 3: High</b><br/>Gemini 3.8 Flash High<br/><i>consultant-high</i>"]:::highBox
+
+    Low --> CheckLow{"Execution Check"}:::checkStatus
+    Med --> CheckMed{"Execution Check"}:::checkStatus
+
+    CheckLow -->|"Success"| Done(["Verified Completion"]):::doneBox
+    CheckMed -->|"Success"| Done
+    High --> Done
+
+    CheckLow -->|"Error / Hesitation Detected<br/><b>evaluate_task_uncertainty</b>"| Med
+    CheckMed -->|"Architectural Roadblock<br/><b>evaluate_task_uncertainty</b>"| High
+
+    classDef promptBox fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef routerBox fill:#1e293b,stroke:#06b6d4,stroke-width:2px,color:#ffffff;
+    classDef lowBox fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff;
+    classDef medBox fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef highBox fill:#4c0519,stroke:#f43f5e,stroke-width:2px,color:#ffffff;
+    classDef checkStatus fill:#1f2937,stroke:#f59e0b,stroke-width:2px,color:#ffffff;
+    classDef doneBox fill:#022c22,stroke:#22c55e,stroke-width:2px,color:#ffffff;
 ```
 
 ---
