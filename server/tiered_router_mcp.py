@@ -23,7 +23,7 @@ from typing import Dict, Any, Optional, Tuple
 
 OLLAMA_HOST = "http://127.0.0.1:11434"
 KEV_MODEL_NAME = "kev"
-CONNECT_TIMEOUT_SEC = 1.0
+CONNECT_TIMEOUT_SEC = 4.0
 
 
 def log(msg: str) -> None:
@@ -268,20 +268,14 @@ def heuristic_classifier(prompt: str, context: Optional[Dict[str, Any]] = None) 
 def route_task(prompt: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Intelligent Hybrid Ensemble:
-    1. First evaluates deterministic semantic rules (instant 0.2ms).
-    2. If the prompt contains clear high-confidence signals for Low or High, uses it directly.
-    3. If the prompt is an implementation task or ambiguous, queries the local Kev decision model (Ollama).
-    4. Falls back gracefully if Ollama is busy or offline.
+    1. Primary: Queries native Kev-0.8B System One decision model (/v1/systemone) on local GPU.
+    2. Fallback: Uses deterministic semantic heuristic engine if Ollama is offline or times out.
     """
-    heu_decision = heuristic_classifier(prompt, context)
-    if heu_decision["tier"] in ("low", "high") and heu_decision["confidence"] >= 0.75:
-        return heu_decision
-
     kev_result = query_kev_systemone(prompt)
     if kev_result:
         return kev_result
 
-    return heu_decision
+    return heuristic_classifier(prompt, context)
 
 
 def evaluate_uncertainty(subagent_output: str, current_tier: str = "low") -> Dict[str, Any]:
@@ -292,10 +286,12 @@ def evaluate_uncertainty(subagent_output: str, current_tier: str = "low") -> Dic
     text = subagent_output.lower()
 
     uncertainty_patterns = [
-        "não tenho certeza", "não consegui", "não tenho como saber", "talvez",
+        "não tenho certeza", "nao tenho certeza", "não consegui", "nao consegui",
+        "não tenho como saber", "nao tenho como saber", "talvez", "dúvida", "duvida",
         "i am unsure", "i am not certain", "cannot determine", "uncertain",
         "failed to resolve", "could not fix", "unknown error",
-        "não foi possível encontrar", "não sei", "hesito", "limitation",
+        "não foi possível encontrar", "nao foi possivel encontrar",
+        "não sei", "nao sei", "hesito", "hesitacao", "limitation",
         "error:", "exception:", "traceback", "stacktrace", "failed with code 1",
         "syntaxerror", "typeerror", "referenceerror", "test failed"
     ]
