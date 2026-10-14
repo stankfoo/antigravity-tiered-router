@@ -22,6 +22,7 @@ Unlike traditional static proxies, it incorporates an **active runtime uncertain
 - **Deterministic Heuristic Engine**: Sub-millisecond (0.2 ms) offline regex boundary parser acting as an instant failover if the local Ollama daemon is offline.
 - **Active Antiback Protocol**: Continuous self-assessment tool (`evaluate_task_uncertainty`) preventing subagent loops and hallucinatory retries.
 - **Measurable Token Economy**: Yields **26.7% to 84% token savings** across typical day-to-day software engineering tasks.
+- **Continuous Real-Time Grounding**: Dedicated verification skill (`latest-info-verifier`) ensuring web searches are performed proactively for the most up-to-date specs, dependencies, and frontier model designations.
 - **Telemetry Dashboard**: Built-in real-time monitoring interface served locally on port 8085.
 
 ---
@@ -240,6 +241,7 @@ O **Antigravity Tiered Router (Projeto Antiback)** é uma arquitetura de roteame
 2. **Motor Heurístico Determinístico**: Fallback instantâneo offline (0,2 ms) caso o daemon local esteja indisponível.
 3. **Protocolo Antiback Ativo**: Se um subagente encontra uma exceção ou incerteza durante a execução, ele aciona a ferramenta `evaluate_task_uncertainty` e é promovido automaticamente ao modelo sênior com todo o contexto preservado.
 4. **Economia Real Comprovada**: Até **84% de redução de tokens** em inspeções e **26,7% de economia líquida** no portfólio completo de desenvolvimento.
+5. **Verificação em Tempo Real Contínua**: Skill dedicada (`latest-info-verifier`) para ancoragem e busca de informações atualizadas na internet a cada consulta, mantendo bibliotecas e modelos sempre no estado da arte.
 
 ### 🧩 Suporte a Qualquer Família de Modelos (Arquitetura Modular)
 O Kev-0.8B classifica tarefas por **complexidade intrínseca** (leitura vs. implementação vs. arquitetura) e não pelo nome comercial da API. Isso significa que você pode trocar a família padrão por qualquer fornecedor:
@@ -279,8 +281,11 @@ projeto_antiback/
 ├── server/                        # MCP JSON-RPC Server
 │   ├── __init__.py                # Server package marker
 │   └── tiered_router_mcp.py       # Core router engine and MCP tools
-├── skills/tiered-router/          # Antigravity workflow skill instructions
-│   └── SKILL.md                   # Operational procedures for IDE agents
+├── skills/                        # Antigravity workflow skills
+│   ├── tiered-router/             # Model escalation & token optimization
+│   │   └── SKILL.md               # Operational procedures for IDE agents
+│   └── latest-info-verifier/      # Proactive internet research & fact-checking
+│       └── SKILL.md               # Real-time search & temporal grounding guidelines
 ├── tests/                         # Unit tests and deep stress validation
 │   ├── test_router.py             # 8 unit tests for MCP protocol and triage
 │   └── deep_audit_tiered_router.py # 25 adversarial and stress scenarios
