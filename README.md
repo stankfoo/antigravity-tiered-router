@@ -1,7 +1,7 @@
 # Antigravity Tiered Router & Fallback System (Projeto Antiback)
 
 [![Antigravity Plugin](https://img.shields.io/badge/Antigravity_IDE-Plugin_Ready-blue?style=flat-square&logo=google)](./plugin.json)
-[![Models](https://img.shields.io/badge/Model_Support-Gemini_3.8_Flash_(Low/Med/High)-6f42c1?style=flat-square)](./rules/tiered_escalation.md)
+[![Models](https://img.shields.io/badge/Model_Support-Gemini_3.8_Flash_%2F_Gemini_4_Argon-6f42c1?style=flat-square)](./rules/tiered_escalation.md)
 [![Decision Engine](https://img.shields.io/badge/Decision_Engine-Kev_System_One_(0.8B)_+_Heuristic-059669?style=flat-square)](https://huggingface.co/ggml-org/Kev-0.8B-GGUF)
 [![Token Savings](https://img.shields.io/badge/Token_Savings-Up_to_84%25-10b981?style=flat-square)](./benchmarks/deep_audit_results.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square)](./LICENSE)
@@ -91,10 +91,11 @@ This abstraction makes the architecture **100% provider-agnostic**. While the de
 | Provider / Strategy | Tier 1 (Low Runner) | Tier 2 (Medium Executor) | Tier 3 (High Consultant) | Ideal For |
 | :--- | :--- | :--- | :--- | :--- |
 | **Default (Google)** | Gemini 3.8 Flash (Low) | Gemini 3.8 Flash (Medium) | Gemini 3.8 Flash (High) / Pro | Zero setup, out-of-the-box Antigravity IDE |
-| **Anthropic Claude** | `claude-3-5-haiku-latest` | `claude-3-5-sonnet-latest` | `claude-3-opus-latest` | High-precision coding and refactoring |
-| **OpenAI** | `gpt-4o-mini` | `gpt-4o` | `o1` or `o3-mini` | Deep reasoning and mathematical verification |
+| **Google Frontier (Argon)** | `gemini-3.8-flash-low` | `gemini-3.8-flash-medium` | **`gemini-4-argon`** | Frontier multimodal reasoning, deep synthesis & complex architecture |
+| **Anthropic Claude (5.5 Gen)** | `claude-haiku-5-5` | `claude-sonnet-5-5` | **`claude-opus-5-5`** | Autonomous agentic coding, massive 1M context refactoring & software migrations |
+| **OpenAI (GPT-6 / Sol)** | `gpt-5.6-mini` / `o4-mini` | `gpt-6.1-sol` | `gpt-6-astra` / `o3` | Complex automation, Intelligent UI synthesis & deep mathematical reasoning |
 | **100% Local (Ollama)** | `qwen2.5-coder:1.5b` | `qwen2.5-coder:7b` | `deepseek-r1:14b` or `llama3.3:70b` | Air-gapped, zero cloud cost, 100% privacy |
-| **Hybrid Zero-Cost** | Local Ollama (0 tokens) | Gemini 3.8 Flash (Low cost) | Claude 3.5 Sonnet / Gemini Pro | Maximum token optimization |
+| **Hybrid Zero-Cost** | Local Ollama (0 tokens) | Gemini 3.8 Flash (Low cost) | Claude Opus 5.5 / Gemini 4 Argon | Maximum token optimization with frontier escalation |
 
 ---
 
@@ -107,15 +108,15 @@ Open the subagent markdown files in `agents/` and modify the `model:` property i
 
 - **[`agents/task-runner-low.md`](./agents/task-runner-low.md)**:
   ```yaml
-  model: claude-3-5-haiku-latest  # or gpt-4o-mini, qwen2.5-coder:1.5b
+  model: claude-haiku-5-5        # or gpt-5.6-mini, qwen2.5-coder:1.5b
   ```
 - **[`agents/task-runner-medium.md`](./agents/task-runner-medium.md)**:
   ```yaml
-  model: claude-3-5-sonnet-latest # or gpt-4o, qwen2.5-coder:7b
+  model: claude-sonnet-5-5       # or gpt-6.1-sol, qwen2.5-coder:7b
   ```
 - **[`agents/consultant-high.md`](./agents/consultant-high.md)**:
   ```yaml
-  model: claude-3-opus-latest    # or o1, deepseek-r1:14b
+  model: claude-opus-5-5         # or gemini-4-argon, gpt-6-astra, o3
   ```
 
 #### 2. Update Governance Rule (`rules/tiered_escalation.md`)
@@ -125,13 +126,36 @@ Update the table in [`rules/tiered_escalation.md`](./rules/tiered_escalation.md)
 To expose explicit model identifiers in the JSON-RPC response, you can map `recommended_model` in `classify_and_route_task`:
 ```python
 model_mapping = {
-    "low": "claude-3-5-haiku-latest",
-    "medium": "claude-3-5-sonnet-latest",
-    "high": "claude-3-opus-latest",
+    "low": "claude-haiku-5-5",
+    "medium": "claude-sonnet-5-5",
+    "high": "claude-opus-5-5",
 }
 ```
 
-#### 4. (Optional) Update Dashboard Labels (`dashboard/app.js`)
+#### 4. Example: Frontier Setup with Gemini 4 Argon
+To configure Google's frontier **Gemini 4 Argon** as the Tier 3 senior architectural authority alongside high-speed Gemini Flash tiers:
+
+1. In **[`agents/consultant-high.md`](./agents/consultant-high.md)**:
+   ```yaml
+   ---
+   name: consultant-high
+   description: Senior architectural consultant and problem solver (Tier 3: High).
+   model: gemini-4-argon
+   subagent: true
+   ---
+   ```
+
+2. In **`server/tiered_router_mcp.py`** (custom model mapping):
+   ```python
+   # Custom triad mapping for Gemini 4 Argon
+   model_mapping = {
+       "low": "gemini-3.8-flash-low",       # Fast file inspection & syntax checks (85% token savings)
+       "medium": "gemini-3.8-flash-medium", # Core feature execution and tests (55% token savings)
+       "high": "gemini-4-argon",            # Frontier architectural reasoning & crisis recovery
+   }
+   ```
+
+#### 5. (Optional) Update Dashboard Labels (`dashboard/app.js`)
 Update the card titles and cost multiplier metrics in `dashboard/app.js` if you want the telemetry dashboard to reflect custom pricing per million tokens.
 
 ---
@@ -219,10 +243,11 @@ O **Antigravity Tiered Router (Projeto Antiback)** é uma arquitetura de roteame
 
 ### 🧩 Suporte a Qualquer Família de Modelos (Arquitetura Modular)
 O Kev-0.8B classifica tarefas por **complexidade intrínseca** (leitura vs. implementação vs. arquitetura) e não pelo nome comercial da API. Isso significa que você pode trocar a família padrão por qualquer fornecedor:
-- **Anthropic Claude**: Haiku (Low) ➔ Sonnet (Med) ➔ Opus (High)
-- **OpenAI**: GPT-4o-mini (Low) ➔ GPT-4o (Med) ➔ o1 / o3-mini (High)
+- **Google Frontier (Argon)**: Gemini 3.8 Flash (Low) ➔ Gemini 3.8 Flash (Med) ➔ Gemini 4 Argon (High)
+- **Anthropic Claude (Geração 5.5)**: Claude Haiku 5.5 (Low) ➔ Claude Sonnet 5.5 (Med) ➔ Claude Opus 5.5 (High)
+- **OpenAI (Linha GPT-6 / Sol)**: GPT-5.6-mini / o4-mini (Low) ➔ GPT-6.1 Sol (Med) ➔ GPT-6 Astra / o3 (High)
 - **100% Local (Ollama)**: Qwen 1.5B (Low) ➔ Qwen 7B (Med) ➔ DeepSeek-R1 / Llama 70B (High)
-- **Híbrido Custo Zero**: Ollama Local (0 tokens) ➔ Gemini Flash (Med) ➔ Claude Opus (High)
+- **Híbrido Custo Zero**: Ollama Local (0 tokens) ➔ Gemini 3.8 Flash (Med) ➔ Claude Opus 5.5 / Gemini 4 Argon (High)
 
 Basta alterar a propriedade `model:` no cabeçalho YAML dos arquivos em `agents/` (`task-runner-low.md`, `task-runner-medium.md`, `consultant-high.md`). O roteador e o fallback funcionam imediatamente sem necessidade de retreinar o Kev!
 

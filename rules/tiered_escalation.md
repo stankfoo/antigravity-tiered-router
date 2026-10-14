@@ -8,7 +8,7 @@ This rule governs how tasks and subagent operations are delegated across model t
 | :--- | :--- | :--- | :--- |
 | **Tier 1 (Low)** | Gemini 3.8 Flash (Low) | `task-runner-low` | File lookups, simple greps, syntax check, status, minor 1-line edits. Saves ~85% tokens. |
 | **Tier 2 (Medium)** | Gemini 3.8 Flash (Medium) | `task-runner-medium` | Core development, multi-file edits, writing tests, debugging, feature implementation. |
-| **Tier 3 (High)** | Gemini 3.8 Flash (High) | `consultant-high` | System architecture, complex debugging, security audits, fallback when lower tiers fail. |
+| **Tier 3 (High)** | Gemini 3.8 Flash (High) / Gemini 4 Argon | `consultant-high` | System architecture, complex debugging, security audits, fallback when lower tiers fail. |
 
 ---
 
